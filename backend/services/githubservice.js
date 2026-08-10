@@ -2,7 +2,7 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
 // Extracts "owner" and "repo" from a full GitHub URL
 function parseGithubUrl(repoUrl) {
-  const cleaned = repoUrl.replace(/\/$/, ""); // remove trailing slash if present
+  const cleaned = repoUrl.replace(/\/$/, "").replace(/\.git$/, "");
   const parts = cleaned.split("/");
   const owner = parts[parts.length - 2];
   const repo = parts[parts.length - 1];
