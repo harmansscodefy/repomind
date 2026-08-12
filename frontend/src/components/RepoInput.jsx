@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-function RepoInput({ onIngestComplete }) {
+function RepoInput({ onIngestComplete, token }) {
   const [repoUrl, setRepoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -14,7 +14,10 @@ function RepoInput({ onIngestComplete }) {
     try {
       const response = await fetch("http://localhost:5050/ingest", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ repoUrl }),
       });
 
@@ -34,34 +37,32 @@ function RepoInput({ onIngestComplete }) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 max-w-xl mx-auto">
+    <div className="pixel-card flex flex-col items-center gap-5 max-w-xl mx-auto p-8">
       <div className="flex flex-col items-center gap-3 text-center">
-        <h1 className="pixel-heading text-7xl text-white">
-  REPO<span className="text-pink-300">MIND</span>
-</h1>
-        <p className="pixel-tag text-slate-250 leading-relaxed ">
-  STOP GREPPING. START ASKING.
-</p>
-<p className="text-slate-600 text-sm max-w-md font-mono pixel-tag">
-  Any GitHub repo. Any question. Real answers, straight from the source —
-  with receipts.
-</p>
+        <h1 className="pixel-heading text-2xl text-white">
+          REPO<span className="text-pink-300">MIND</span>
+        </h1>
+        <p className="pixel-tag text-slate-400 leading-relaxed">
+          STOP GREPPING. START ASKING.
+        </p>
+        <p className="text-slate-500 text-sm max-w-md font-mono">
+          Any GitHub repo. Any question. Real answers, straight from the source — with receipts.
+        </p>
       </div>
 
-      <div className="pixel-card flex flex-col items-center 
-      gap-3 p-4 w-full pixel-tag">
+      <div className="flex flex-col sm:flex-row gap-3 w-full">
         <Input
           value={repoUrl}
           onChange={(e) => setRepoUrl(e.target.value)}
           placeholder="https://github.com/owner/repo"
-          className="text-white"
+          className="pixel-input text-white flex-1"
         />
         <Button onClick={handleIngest} disabled={loading || !repoUrl} className="pixel-button-pink">
-  {loading ? "CRACKING OPEN THE REPO..." : "LET'S GO"}
-</Button>
+          {loading ? "CRACKING OPEN THE REPO..." : "LET'S GO"}
+        </Button>
       </div>
 
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-red-400 text-sm font-mono">{error}</p>}
     </div>
   );
 }
