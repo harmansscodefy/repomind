@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const chunkSchema = new mongoose.Schema(
   {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     repoUrl: { type: String, required: true },
     fileName: { type: String, required: true },
     code: { type: String, required: true },
