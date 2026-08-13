@@ -77,7 +77,7 @@ function MyRepos({ token, onSelectRepo, onNewRepo, onLogout }) {
                     <div
                         key={repo.repoUrl}
                         onClick={() => onSelectRepo(repo.repoUrl)}
-                        className="pixel-input flex items-center justify-between gap-3 cursor-pointer hover:border-pink-300"
+                        className="pixel-card p-4 flex items-center justify-between gap-3 cursor-pointer hover:border-pink-300"
                     >
                         <div className="flex flex-col overflow-hidden">
                             <span className="text-white text-sm font-mono truncate">
@@ -91,7 +91,7 @@ function MyRepos({ token, onSelectRepo, onNewRepo, onLogout }) {
                         <button
                             onClick={(e) => handleDelete(repo.repoUrl, e)}
                             disabled={deletingUrl === repo.repoUrl}
-                            className="text-slate-500 text-xs font-mono hover:text-red-400 shrink-0"
+                            className="text-slate-500 text-xs font-mono hover:text-red-400 shrink-0 pixel-card p-3"
                         >
                             {deletingUrl === repo.repoUrl ? "..." : "delete"}
                         </button>
