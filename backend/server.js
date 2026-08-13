@@ -1,7 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");const { parseGithubUrl, walkRepo } = require("./services/githubservice");
+const cors = require("cors");
+const { parseGithubUrl, walkRepo } = require("./services/githubservice");
 const { chunkFiles } = require("./services/chunkingService");
 const { embedChunks } = require("./services/embeddingService");
 const Chunk = require("./models/Chunk");
@@ -108,7 +109,7 @@ async function startServer() {
   }
 }
 
-app.post("/ingest", requireAuth,async (req, res) => {
+/*app.post("/ingest", requireAuth,async (req, res) => {
   const { repoUrl } = req.body;
 
   // Step 1: Validate input
@@ -153,9 +154,71 @@ app.post("/ingest", requireAuth,async (req, res) => {
     console.error("Ingestion failed:", error.message);
     res.status(500).json({ error: "Ingestion failed", details: error.message });
   }
+});*/
+
+
+
+
+
+app.post("/ingest", requireAuth, async (req, res) => {
+    const { repoUrl } = req.body;
+    console.log("Step 0: request received for", repoUrl);
+
+    const isValidUrl = /^https:\/\/github\.com\/[\w-]+\/[\w.-]+\/?$/.test(repoUrl);
+    if (!repoUrl || !isValidUrl) {
+        return res.status(400).json({ error: "Please provide a valid GitHub repo URL" });
+    }
+
+    try {
+        const existingChunk = await Chunk.findOne({ repoUrl, userId: req.user.userId });
+        console.log("Step 1: dedupe check done");
+        if (existingChunk) {
+            const chunkCount = await Chunk.countDocuments({ repoUrl, userId: req.user.userId });
+            return res.json({
+                message: "Repo already ingested — reusing existing data",
+                repoUrl,
+                filesProcessed: 0,
+                chunksStored: chunkCount,
+                alreadyIngested: true,
+            });
+        }
+
+        const { owner, repo } = parseGithubUrl(repoUrl);
+        console.log("Step 2: parsed", owner, repo);
+
+        const files = await walkRepo(owner, repo);
+        console.log("Step 3: files fetched, count =", files.length);
+        if (files.length === 0) {
+            return res.status(404).json({ error: "No relevant files found in this repo" });
+        }
+
+        const chunks = chunkFiles(files);
+        console.log("Step 4: chunked, count =", chunks.length);
+
+        const embeddedChunks = await embedChunks(chunks);
+        console.log("Step 5: embedded");
+
+        // THIS is what was missing:
+        const chunksToSave = embeddedChunks.map((chunk) => ({
+            ...chunk,
+            repoUrl: repoUrl,
+            userId: req.user.userId,
+        }));
+
+        const saved = await Chunk.insertMany(chunksToSave);
+        console.log("Step 6: inserted", saved.length, "chunks");
+
+        res.json({
+            message: "Ingestion complete",
+            repoUrl: repoUrl,
+            filesProcessed: files.length,
+            chunksStored: saved.length,
+        });
+    } catch (error) {
+        console.error("Ingestion failed:", error.message);
+        res.status(500).json({ error: "Ingestion failed", details: error.message });
+    }
 });
-
-
 
 const { getEmbedding } = require("./services/embeddingService");
 

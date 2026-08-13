@@ -1,50 +1,65 @@
 import { useState, useEffect } from "react";
 import AuthScreen from "@/components/AuthScreen";
+import MyRepos from "@/components/MyRepos";
 import RepoInput from "@/components/RepoInput";
 import ChatInterface from "@/components/ChatInterface";
 import BackgroundPattern from "@/components/BackgroundPattern";
 
 function App() {
-  const [auth, setAuth] = useState(null); // { token, email }
-  const [ingestedRepo, setIngestedRepo] = useState(null);
+    const [auth, setAuth] = useState(null);
+    const [view, setView] = useState("repos"); // "repos" | "ingest" | "chat"
+    const [activeRepo, setActiveRepo] = useState(null);
 
-  // On page load, check if a token already exists from a previous session
-  useEffect(() => {
-    const token = localStorage.getItem("repomind_token");
-    const email = localStorage.getItem("repomind_email");
-    if (token && email) {
-      setAuth({ token, email });
+    useEffect(() => {
+        const token = localStorage.getItem("repomind_token");
+        const email = localStorage.getItem("repomind_email");
+        if (token && email) setAuth({ token, email });
+    }, []);
+
+    function handleLogout() {
+        localStorage.removeItem("repomind_token");
+        localStorage.removeItem("repomind_email");
+        setAuth(null);
+        setView("repos");
+        setActiveRepo(null);
     }
-  }, []);
 
-  function handleLogout() {
-    localStorage.removeItem("repomind_token");
-    localStorage.removeItem("repomind_email");
-    setAuth(null);
-    setIngestedRepo(null);
-  }
+    function handleIngestComplete(data) {
+        setActiveRepo(data.repoUrl);
+        setView("chat");
+    }
 
-  return (
-    <div className="min-h-screen relative flex items-center justify-center p-4">
-      <BackgroundPattern />
-      {auth && (
-  <button
-    onClick={handleLogout}
-    className="fixed top-4 right-4 text-slate-400 text-xs font-mono hover:text-white pixel-pill px-3 py-1.5"
-  >
-    LOGOUT ({auth.email})
-  </button>
-)}
+    return (
+        <div className="min-h-screen relative flex items-center justify-center p-4">
+            <BackgroundPattern />
 
-      {!auth ? (
-        <AuthScreen onAuthSuccess={setAuth} />
-      ) : !ingestedRepo ? (
-        <RepoInput onIngestComplete={setIngestedRepo} token={auth.token} />
-      ) : (
-        <ChatInterface repoUrl={ingestedRepo.repoUrl} token={auth.token} />
-      )}
-    </div>
-  );
+            {!auth ? (
+                <AuthScreen onAuthSuccess={setAuth} />
+            ) : view === "repos" ? (
+                <MyRepos
+                    token={auth.token}
+                    onSelectRepo={(repoUrl) => {
+                        setActiveRepo(repoUrl);
+                        setView("chat");
+                    }}
+                    onNewRepo={() => setView("ingest")}
+                    onLogout={handleLogout}
+                />
+            ) : view === "ingest" ? (
+                <RepoInput
+                    onIngestComplete={handleIngestComplete}
+                    token={auth.token}
+                    onBack={() => setView("repos")}
+                />
+            ) : (
+                <ChatInterface
+                    repoUrl={activeRepo}
+                    token={auth.token}
+                    onBack={() => setView("repos")}
+                />
+            )}
+        </div>
+    );
 }
 
 export default App;

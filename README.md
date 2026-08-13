@@ -22,14 +22,7 @@ Built as a full-stack Retrieval-Augmented Generation (RAG) system, from scratch 
 **Database:** MongoDB Atlas (with native Vector Search)
 **AI:** Google Gemini (embeddings + generation)
 
-## Key Engineering Decisions
-
-- **Hand-built RAG pipeline** — no LangChain or similar frameworks, to demonstrate deep understanding of retrieval, chunking, and prompt-grounding rather than relying on abstracted library calls
-- **Function/class-aware chunking** — a custom chunker that preserves complete code logic per chunk, with a "leftover" capture mechanism ensuring no file content is silently dropped
-- **Citation-enforced prompting** — the LLM is explicitly instructed to answer only from retrieved context and cite file/line sources, with a rule to admit uncertainty rather than hallucinate
-- **Retry-with-backoff on rate limits** — automatically retries failed embedding calls with exponential backoff, rather than failing outright on transient API limits
-- **Security-conscious design** — GitHub URL validation to prevent malformed/malicious input, rate limiting on API-cost-sensitive endpoints, and strict separation of secrets via environment variables
-
+c
 ## Vector Search Configuration
 
 MongoDB Atlas Vector Search index configuration:

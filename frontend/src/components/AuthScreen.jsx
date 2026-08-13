@@ -43,8 +43,8 @@ function AuthScreen({ onAuthSuccess }) {
   }
 
   return (
-    <div className="pixel-card flex flex-col gap-4 max-w-sm mx-auto p-20">
-      <h1 className="pixel-heading text-xl text-white text-center ">
+    <div className=" pixel-card flex flex-col gap-4 max-w-sm mx-auto p-20">
+      <h1 className="pixel-heading text-3xl text-white text-center align-center"> 
         REPO<span className="text-pink-300">MIND</span>
       </h1>
       <p className="pixel-tag text-slate-400 text-center text-[10px]">
