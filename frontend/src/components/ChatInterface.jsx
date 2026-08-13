@@ -165,7 +165,7 @@ function ChatInterface({ repoUrl, token, onBack }) {
           </div>
         ))}
         {loading && (
-          <div className="pixel-bubble-answer p-3 max-w-[80%] italic font-mono text-sm">
+          <div className=" pixel-tag pixel-bubble-answer p-3 max-w-[80%] italic font-mono text-sm">
             HUNTING THROUGH THE CODE...
           </div>
         )}
