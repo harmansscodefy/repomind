@@ -1,7 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+
 const cors = require("cors");
+
 const { parseGithubUrl, walkRepo } = require("./services/githubservice");
 const { chunkFiles } = require("./services/chunkingService");
 const { embedChunks } = require("./services/embeddingService");
@@ -18,7 +20,28 @@ const requireAuth = require("./middleware/requireAuth");
 const app = express();
 
 // --- Middleware ---
-app.use(cors());          // allows your frontend (different port) to talk to this server
+//app.use(cors());          // allows your frontend (different port) to talk to this server
+//replacing cors with below code
+
+const allowedOrigins = [
+  "http://localhost:5173", // local dev
+  "http://localhost:5174", // local dev (alternate port, remember this happened before)
+  process.env.FRONTEND_URL, // production frontend URL, set via env var
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like curl, Postman) during development
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  })
+);
+
 app.use(express.json());  // parses incoming JSON request bodies into req.body
 
 

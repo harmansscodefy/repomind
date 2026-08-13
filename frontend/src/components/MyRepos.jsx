@@ -15,7 +15,7 @@ function MyRepos({ token, onSelectRepo, onNewRepo, onLogout }) {
         setLoading(true);
         setError("");
         try {
-            const response = await fetch("http://localhost:5050/my-repos", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/my-repos`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const data = await response.json();

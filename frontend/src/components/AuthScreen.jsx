@@ -17,7 +17,7 @@ function AuthScreen({ onAuthSuccess }) {
     const endpoint = isRegistering ? "/register" : "/login";
 
     try {
-      const response = await fetch(`http://localhost:5050${endpoint}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
