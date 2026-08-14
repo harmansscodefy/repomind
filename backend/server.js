@@ -382,10 +382,10 @@ app.get("/my-repos", requireAuth, async (req, res) => {
   }
 });
 
-app.delete("/repos/:repoUrl", requireAuth, async (req, res) => {
+app.delete("/repos", requireAuth, async (req, res) => {
   try {
     const userIdObjectId = new mongoose.Types.ObjectId(req.user.userId);
-    const repoUrl = decodeURIComponent(req.params.repoUrl);
+    const repoUrl = req.query.repoUrl;
 
     const result = await Chunk.deleteMany({
       userId: userIdObjectId,

@@ -35,10 +35,10 @@ function MyRepos({ token, onSelectRepo, onNewRepo, onLogout }) {
         e.stopPropagation(); // don't trigger onSelectRepo when clicking delete
         setDeletingUrl(repoUrl);
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/repos/${encodeURIComponent(repoUrl)}`,
-                { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
-            );
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/repos?repoUrl=${encodeURIComponent(repoUrl)}`, {
+                        method: "DELETE",
+                     headers: { Authorization: `Bearer ${token}` },
+});
             if (response.ok) {
                 setRepos((prev) => prev.filter((r) => r.repoUrl !== repoUrl));
             }
