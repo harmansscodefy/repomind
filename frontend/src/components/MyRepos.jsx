@@ -36,7 +36,7 @@ function MyRepos({ token, onSelectRepo, onNewRepo, onLogout }) {
         setDeletingUrl(repoUrl);
         try {
             const response = await fetch(
-                `http://localhost:5050/repos/${encodeURIComponent(repoUrl)}`,
+                `${import.meta.env.VITE_API_URL}/repos/${encodeURIComponent(repoUrl)}`,
                 { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
             );
             if (response.ok) {
