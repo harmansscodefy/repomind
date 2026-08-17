@@ -129,6 +129,7 @@ async function getEmbedding(text) {
 // and calls getBatchEmbeddings() once per group (104 chunks =
 // ~6 API calls: 5 full batches of 20 + 1 partial batch of 4).
 async function embedChunks(chunks) {
+  currentKeyIndex = 0;
   const embeddedChunks = [];
 
   // Walk through the chunks array in steps of BATCH_SIZE,
