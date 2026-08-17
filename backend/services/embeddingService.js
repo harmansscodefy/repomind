@@ -52,17 +52,12 @@ async function getBatchEmbeddings(texts, retries = 3) {
   for (let attempt = 0; attempt <= retries; attempt++) {
     const apiKey = API_KEYS[currentKeyIndex];
 
-    // Single request carrying ALL texts in this batch —
-    // this replaces what used to be one request per chunk.
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:batchEmbedContents?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          // Gemini's batch endpoint wants an array of individual
-          // "requests," one per text, even though they all travel
-          // together in this one HTTP call.
           requests: texts.map((text) => ({
             model: "models/gemini-embedding-001",
             content: { parts: [{ text }] },
@@ -72,17 +67,26 @@ async function getBatchEmbeddings(texts, retries = 3) {
     );
 
     if (response.status === 429) {
-      // Case 1: we have another key we haven't tried yet — switch and retry now.
       if (currentKeyIndex < API_KEYS.length - 1) {
         currentKeyIndex++;
         console.log(`Key ${currentKeyIndex} rate limited, switching to key ${currentKeyIndex + 1}`);
-        continue; // loop back immediately with the new key, no delay
+        continue;
       }
-
-      // Case 2: every key is rate-limited — back off and try again.
       if (attempt < retries) {
-        const waitTime = 1000 * Math.pow(2, attempt); // 1s, 2s, 4s
+        const waitTime = 1000 * Math.pow(2, attempt);
         console.log(`All keys rate limited, retrying batch in ${waitTime}ms`);
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
+        continue;
+      }
+    }
+
+    // NEW: handle 503 (and other 5xx) the same way — Gemini's own
+    // servers being temporarily overloaded, not something switching
+    // keys would fix, but worth retrying with backoff.
+    if (response.status >= 500 && response.status < 600) {
+      if (attempt < retries) {
+        const waitTime = 1000 * Math.pow(2, attempt);
+        console.log(`Gemini server error ${response.status}, retrying batch in ${waitTime}ms`);
         await new Promise((resolve) => setTimeout(resolve, waitTime));
         continue;
       }
@@ -93,8 +97,6 @@ async function getBatchEmbeddings(texts, retries = 3) {
     }
 
     const data = await response.json();
-    // Gemini returns embeddings in the SAME ORDER as the texts we sent,
-    // so embeddings[i] corresponds to texts[i].
     return data.embeddings.map((e) => e.values);
   }
 }
