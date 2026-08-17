@@ -21,7 +21,7 @@
 // Two Gemini API keys, used as fallbacks for each other.
 // .filter(Boolean) drops GEMINI_API_KEY_2 from the array if it's
 // not set in your environment, so this works fine with just one key too.
-const API_KEYS = [process.env.GEMINI_API_KEY, process.env.GEMINI_API_KEY_2].filter(Boolean);
+const API_KEYS = [process.env.GEMINI_API_KEY, process.env.GEMINI_API_KEY_DEV].filter(Boolean);
 
 // Tracks which key we're currently using. Starts at the first key (index 0)
 // and only moves forward (never resets) once a key gets rate-limited.
