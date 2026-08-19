@@ -91,7 +91,11 @@ async function getBatchEmbeddings(texts, retries = 3) {
         continue;
       }
     }
-
+    if (!response.ok) {
+  const errorBody = await response.text();
+  console.log("Gemini error body:", errorBody);
+  throw new Error(`Gemini batch API error: ${response.status}`);
+}
     if (!response.ok) {
       throw new Error(`Gemini batch API error: ${response.status}`);
     }
