@@ -30,7 +30,7 @@ let currentKeyIndex = 0;
 // How many chunks to send to Gemini in a single batch request.
 // 20 is a safe middle ground: large enough to cut request count
 // way down, small enough to avoid hitting any single-request size limits.
-const BATCH_SIZE = 100;
+const BATCH_SIZE = 20;
 
 // ------------------------------------------------------------
 // getBatchEmbeddings(texts, retries)
