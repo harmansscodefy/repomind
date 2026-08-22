@@ -5,16 +5,15 @@ An end-to-end, hand-built Retrieval-Augmented Generation (RAG) platform that tra
 
 💡 System Architecture
 RepoMind operates on a custom-engineered pipeline built completely from scratch without black-box frameworks like LangChain. Every step—from recursion to vector scoring—is controlled natively in Node.js.
-┌─────────────────┐     ┌──────────────────────┐     ┌────────────────────────┐
+         
 │  GitHub Public  │ ──> │ Custom Ingestion Engine │ ──> │ Function-Aware Chunking │
-│   Repository    │     │  (Recursive Crawling)│     │  (AST/Brace Fallback)  │
-└─────────────────┘     └──────────────────────┘     └────────────────────────┘
-                                                                 │
+│   Repository    │     │  (Recursive Crawling)|         |(AST/Brace Fallback)  │
+           │
                                                                  ▼
-┌─────────────────┐     ┌──────────────────────┐     ┌────────────────────────┐
+
 │  Grounded Answer│ <── │ Google Gemini API    │ <── │ MongoDB Atlas Vector   │
 │ + Source Lines  │     │ (Citation Prompting) │     │ Search (3072 dims)     │
-└─────────────────┘     └──────────────────────┘     └────────────────────────┘
+
 🛠️ Key Technical Features
 Custom Ingestion & Chunking Pipeline: Recursively traverses directory structures, stripping non-code assets while preserving multi-file code hierarchies. Uses a custom function-aware chunking algorithm with brace-level fallbacks to preserve syntactic context.
 Semantic Vector Retrieval: Converts code blocks into high-density vector representations using Google Gemini embeddings (gemini-embedding-001), performing cosine similarity queries within MongoDB Atlas.
