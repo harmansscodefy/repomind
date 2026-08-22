@@ -6,13 +6,12 @@ An end-to-end, hand-built Retrieval-Augmented Generation (RAG) platform that tra
 💡 System Architecture
 RepoMind operates on a custom-engineered pipeline built completely from scratch without black-box frameworks like LangChain. Every step—from recursion to vector scoring—is controlled natively in Node.js.
          
-│  GitHub Public  │ ──> │ Custom Ingestion Engine │ ──> │ Function-Aware Chunking │
-│   Repository    │     │  (Recursive Crawling)|         |(AST/Brace Fallback)  │
-           │
+│  GitHub Public Repository  │ ──> │ Custom Ingestion Engine(Recursive Crawling) │ ──> │ Function-Aware Chunking (AST/Brace Fallback)│
+    
                                                                  ▼
+             
+│  Grounded Answer+ Source Lines │ <── │ Google Gemini API (Citation Prompting)   │ <── │ MongoDB Atlas Vector  Search (3072 dims)   │
 
-│  Grounded Answer│ <── │ Google Gemini API    │ <── │ MongoDB Atlas Vector   │
-│ + Source Lines  │     │ (Citation Prompting) │     │ Search (3072 dims)     │
 
 🛠️ Key Technical Features
 Custom Ingestion & Chunking Pipeline: Recursively traverses directory structures, stripping non-code assets while preserving multi-file code hierarchies. Uses a custom function-aware chunking algorithm with brace-level fallbacks to preserve syntactic context.
