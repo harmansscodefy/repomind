@@ -30,7 +30,7 @@ let currentKeyIndex = 0;
 // How many chunks to send to Gemini in a single batch request.
 // 20 is a safe middle ground: large enough to cut request count
 // way down, small enough to avoid hitting any single-request size limits.
-const BATCH_SIZE = 20;
+const BATCH_SIZE = 8;
 
 // ------------------------------------------------------------
 // getBatchEmbeddings(texts, retries)
@@ -120,6 +120,45 @@ async function getEmbedding(text) {
   return embedding;
 }
 
+function makeBatches(chunks, maxCharsPerBatch = 15000) {
+  const batches = [];
+  let current = [];
+  let currentLength = 0;
+
+  for (const chunk of chunks) {
+    const len = chunk.code.length;
+    if (currentLength + len > maxCharsPerBatch && current.length > 0) {
+      batches.push(current);
+      current = [];
+      currentLength = 0;
+    }
+    current.push(chunk);
+    currentLength += len;
+  }
+  if (current.length > 0) batches.push(current);
+  return batches;
+}
+
+async function embedChunks(chunks) {
+  const embeddedChunks = [];
+  const batches = makeBatches(chunks); // group by text length, not just count
+
+  for (let i = 0; i < batches.length; i++) {
+    const batch = batches[i];
+    const texts = batch.map((chunk) => chunk.code);
+    const embeddings = await getBatchEmbeddings(texts);
+
+    batch.forEach((chunk, index) => {
+      embeddedChunks.push({ ...chunk, embedding: embeddings[index] });
+    });
+
+    if (i < batches.length - 1) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+
+  return embeddedChunks;
+}
 // ------------------------------------------------------------
 // embedChunks(chunks)
 // ------------------------------------------------------------
